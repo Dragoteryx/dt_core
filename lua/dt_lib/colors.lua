@@ -1,0 +1,23 @@
+DT_Lib.CLR_WHITE = Color(238, 238, 255)
+DT_Lib.CLR_SOFT_WHITE = Color(204, 204, 221)
+DT_Lib.CLR_LIGHT_GRAY = Color(153, 153, 170)
+DT_Lib.CLR_DARK_GRAY = Color(68, 68, 85)
+DT_Lib.CLR_BLACK = Color(0, 0, 17)
+DT_Lib.CLR_GREEN = Color(122, 187, 69)
+DT_Lib.CLR_RED = Color(187, 69, 69)
+DT_Lib.CLR_BLUE = Color(69, 122, 187)
+DT_Lib.CLR_ORANGE = Color(187, 111, 69)
+
+local function Transparent(color)
+  return Color(color.r, color.g, color.b, 0)
+end
+
+DT_Lib.CLR_WHITE_TR = Transparent(DT_Lib.CLR_WHITE)
+DT_Lib.CLR_SOFT_WHITE_TR = Transparent(DT_Lib.CLR_SOFT_WHITE)
+DT_Lib.CLR_LIGHT_GRAY_TR = Transparent(DT_Lib.CLR_LIGHT_GRAY)
+DT_Lib.CLR_DARK_GRAY_TR = Transparent(DT_Lib.CLR_DARK_GRAY)
+DT_Lib.CLR_BLACK_TR = Transparent(DT_Lib.CLR_BLACK)
+DT_Lib.CLR_GREEN_TR = Transparent(DT_Lib.CLR_GREEN)
+DT_Lib.CLR_RED_TR = Transparent(DT_Lib.CLR_RED)
+DT_Lib.CLR_BLUE_TR = Transparent(DT_Lib.CLR_BLUE)
+DT_Lib.CLR_ORANGE_TR = Transparent(DT_Lib.CLR_ORANGE)
