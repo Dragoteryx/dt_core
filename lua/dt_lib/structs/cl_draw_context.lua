@@ -195,7 +195,7 @@ local function ShortenText(text, font, maxLength)
   return shortened
 end
 
---- @class DT_Lib.DrawText
+--- @class DT_Lib.DrawTextOptions
 --- @field font string?
 --- @field color any?
 --- @field xAlign number?
@@ -207,7 +207,7 @@ end
 --- @param x number
 --- @param y number
 --- @param text string
---- @param options DT_Lib.DrawText?
+--- @param options? DT_Lib.DrawTextOptions
 function DT_Lib.DRAW_CONTEXT:DrawText(x, y, text, options)
   if options == nil then options = {} end
   local font = options.font or self:GetDefaultFont()
@@ -292,7 +292,7 @@ end
 
 --- @param radius number
 --- @param lines number
---- @param angle number
+--- @param angle? number
 --- @return DT_Lib.DrawPolygonPoint[]
 local function CalcCirclePoints(radius, lines, angle)
   local theta = math.rad(360/lines)
@@ -315,7 +315,7 @@ end
 --- @param y number
 --- @param radius number
 --- @param lines number
---- @param angle number?
+--- @param angle? number
 --- @return DT_Lib.DrawPolygon
 function DT_Lib.DRAW_CONTEXT:CreateCircle(x, y, radius, lines, angle)
   local points = CalcCirclePoints(radius, lines, angle)
@@ -325,7 +325,7 @@ end
 --- @param x number
 --- @param y number
 --- @param size number
---- @param angle number?
+--- @param angle? number
 --- @return DT_Lib.DrawPolygon
 function DT_Lib.DRAW_CONTEXT:CreateTriangle(x, y, size, angle)
   return self:CreateCircle(x, y, size, 3, angle)
@@ -334,7 +334,7 @@ end
 --- @param x number
 --- @param y number
 --- @param size number
---- @param angle number?
+--- @param angle? number
 --- @return DT_Lib.DrawPolygon
 function DT_Lib.DRAW_CONTEXT:CreateDiamond(x, y, size, angle)
   return self:CreateCircle(x, y, size, 4, angle)
@@ -343,7 +343,7 @@ end
 --- @param x number
 --- @param y number
 --- @param size number
---- @param angle number?
+--- @param angle? number
 --- @return DT_Lib.DrawPolygon
 function DT_Lib.DRAW_CONTEXT:CreateHexagon(x, y, size, angle)
   return self:CreateCircle(x, y, size, 6, angle)
@@ -410,7 +410,7 @@ end
 --- @param y number
 --- @param radius number
 --- @param lines number
---- @param angle number?
+--- @param angle? number
 --- @param from number
 --- @param to number
 --- @return DT_Lib.DrawPolygon
@@ -429,6 +429,12 @@ end
 --- @field InnerCircle DT_Lib.DrawPolygon
 DT_Lib.DRAW_RING = {}
 
+--- @param x number
+--- @param y number
+--- @param outerRadius number
+--- @param innerRadius number
+--- @param lines number
+--- @param angle? number
 function DT_Lib.DRAW_CONTEXT:CreateRing(x, y, outerRadius, innerRadius, lines, angle)
   local ring = setmetatable({}, {__index = DT_Lib.DRAW_RING})
   ring.OuterCircle = self:CreateCircle(x, y, outerRadius, lines, angle)
