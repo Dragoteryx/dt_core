@@ -15,44 +15,10 @@ function DT_Lib.DrawContext(width, height)
   ctx.Origin = {x = 0, y = 0}
   ctx.Offset = {x = 0, y = 0}
   ctx.Scale = 1
-  ctx.WrapAround = true
   ctx.Font = "DermaDefault"
   ctx.TextColor = WHITE
   ctx.Polygons = {}
   return ctx
-end
-
---- Converts a local value to a screen value.
---- @param v number @The value to convert
-function DT_Lib.DRAW_CONTEXT:LocalToScreen(v)
-  return v/100*self.Height*self.Scale
-end
-
---- Converts a screen value to a local value.
---- @param v number @The value to convert
-function DT_Lib.DRAW_CONTEXT:ScreenToLocal(v)
-  return v/self.Height/self.Scale*100
-end
-
---- Returns the x and y values of the top left corner.
---- @return number, number
-function DT_Lib.DRAW_CONTEXT:GetTopLeft()
-  return 0, 0
-end
-
---- Returns the x and y values of the bottom right corner.
---- @return number, number
-function DT_Lib.DRAW_CONTEXT:GetBottomRight()
-  local x = self:ScreenToLocal(self.Width)
-  local y = self:ScreenToLocal(self.Height)
-  return x, y
-end
-
---- Returns the x and y values of the center.
---- @return number, number
-function DT_Lib.DRAW_CONTEXT:GetCenter()
-  local x, y = self:GetBottomRight()
-  return x/2, y/2
 end
 
 --- Converts a world pos to a local value.
@@ -65,22 +31,6 @@ function DT_Lib.DRAW_CONTEXT:FromWorldPos(pos)
   local x = self:ScreenToLocal(res.x)
   local y = self:ScreenToLocal(res.y)
   return x, y
-end
-
---- Translates a local coordinate on the X axis to a screen coordinate.
---- @param x number @The value to convert
-function DT_Lib.DRAW_CONTEXT:TranslateX(x)
-  local x = self:LocalToScreen(x + self.Origin.x)
-  if self:GetWrapAround() then x = x % self.Width end
-  return x + self:LocalToScreen(self.Offset.x)
-end
-
---- Translates a local coordinate on the Y axis to a screen coordinate.
---- @param y number @The value to convert
-function DT_Lib.DRAW_CONTEXT:TranslateY(y)
-  local y = self:LocalToScreen(y + self.Origin.y)
-  if self:GetWrapAround() then y = y % self.Height end
-  return y + self:LocalToScreen(self.Offset.y)
 end
 
 --- Get the width of this context.
@@ -121,6 +71,14 @@ function DT_Lib.DRAW_CONTEXT:SetOrigin(x, y)
   self.Origin.y = y
 end
 
+--- Moves the origin relative to its current position.
+--- @param x number @The amount to move the origin on the X axis
+--- @param y number @The amount to move the origin on the Y axis
+function DT_Lib.DRAW_CONTEXT:MoveOrigin(x, y)
+  self.Origin.x = self.Origin.x + x
+  self.Origin.y = self.Origin.y + y
+end
+
 --- Get the offset of this context.
 --- @return number, number
 function DT_Lib.DRAW_CONTEXT:GetOffset()
@@ -135,6 +93,14 @@ function DT_Lib.DRAW_CONTEXT:SetOffset(x, y)
   self.Offset.y = y
 end
 
+--- Adds an offset relative to the current offset.
+--- @param x number @The amount to add to the offset on the X axis
+--- @param y number @The amount to add to the offset on the Y axis
+function DT_Lib.DRAW_CONTEXT:AddOffset(x, y)
+  self.Offset.x = self.Offset.x + x
+  self.Offset.y = self.Offset.y + y
+end
+
 --- Get the scale of this context.
 --- @return number
 function DT_Lib.DRAW_CONTEXT:GetScale()
@@ -147,14 +113,51 @@ function DT_Lib.DRAW_CONTEXT:SetScale(scale)
   self.Scale = scale
 end
 
---- @return boolean
-function DT_Lib.DRAW_CONTEXT:GetWrapAround()
-  return self.WrapAround
+--- Converts a screen value to a local value.
+--- @param v number @The value to convert
+function DT_Lib.DRAW_CONTEXT:ScreenToLocal(v)
+  return v/self.Height/self.Scale*100
 end
 
---- @param wrap boolean @Whether to wrap around the screen
-function DT_Lib.DRAW_CONTEXT:SetWrapAround(wrap)
-  self.WrapAround = wrap
+--- Converts a local value to a screen value.
+--- @param v number @The value to convert
+function DT_Lib.DRAW_CONTEXT:LocalToScreen(v)
+  return v/100*self.Height*self.Scale
+end
+
+--- Translates a local coordinate on the X axis to a screen coordinate.
+--- @param x number @The value to convert
+function DT_Lib.DRAW_CONTEXT:TranslateX(x)
+  local xOrigin = self:LocalToScreen(self.Origin.x) % self.Width
+  return xOrigin + self:LocalToScreen(x + self.Offset.x)
+end
+
+--- Translates a local coordinate on the Y axis to a screen coordinate.
+--- @param y number @The value to convert
+function DT_Lib.DRAW_CONTEXT:TranslateY(y)
+  local yOrigin = self:LocalToScreen(self.Origin.y) % self.Height
+  return yOrigin + self:LocalToScreen(y + self.Offset.y)
+end
+
+--- Returns the x and y values of the top left corner.
+--- @return number, number
+function DT_Lib.DRAW_CONTEXT:GetTopLeft()
+  return 0, 0
+end
+
+--- Returns the x and y values of the bottom right corner.
+--- @return number, number
+function DT_Lib.DRAW_CONTEXT:GetBottomRight()
+  local x = self:ScreenToLocal(self.Width)
+  local y = self:ScreenToLocal(self.Height)
+  return x, y
+end
+
+--- Returns the x and y values of the center.
+--- @return number, number
+function DT_Lib.DRAW_CONTEXT:GetCenter()
+  local x, y = self:GetBottomRight()
+  return x/2, y/2
 end
 
 --- @return string
@@ -198,11 +201,11 @@ end
 --- @class DT_Lib.DrawTextOptions
 --- @field font string?
 --- @field color any?
---- @field xAlign number?
---- @field yAlign number?
+--- @field xAlign integer?
+--- @field yAlign integer?
 --- @field outlineColor any?
 --- @field outlineWidth number?
---- @field maxLength number?
+--- @field maxLength integer?
 
 --- @param x number
 --- @param y number
@@ -287,11 +290,11 @@ end
 --- @param length number
 --- @return DT_Lib.DrawPolygon
 function DT_Lib.DRAW_CONTEXT:CreateSquare(x, y, length)
-  return self:CreateRectangle(x, y, length, length)
+  return self:CreateRectangle(x - length/2, y - length/2, length, length)
 end
 
 --- @param radius number
---- @param lines number
+--- @param lines integer
 --- @param angle? number
 --- @return DT_Lib.DrawPolygonPoint[]
 local function CalcCirclePoints(radius, lines, angle)
@@ -314,7 +317,7 @@ end
 --- @param x number
 --- @param y number
 --- @param radius number
---- @param lines number
+--- @param lines integer
 --- @param angle? number
 --- @return DT_Lib.DrawPolygon
 function DT_Lib.DRAW_CONTEXT:CreateCircle(x, y, radius, lines, angle)
@@ -409,10 +412,10 @@ end
 --- @param x number
 --- @param y number
 --- @param radius number
---- @param lines number
+--- @param lines integer
 --- @param angle? number
---- @param from number
---- @param to number
+--- @param from integer
+--- @param to integer
 --- @return DT_Lib.DrawPolygon
 function DT_Lib.DRAW_CONTEXT:CreateCirclePiece(x, y, radius, lines, angle, from, to)
   local points = CalcCirclePoints(radius, lines, angle)
@@ -433,7 +436,7 @@ DT_Lib.DRAW_RING = {}
 --- @param y number
 --- @param outerRadius number
 --- @param innerRadius number
---- @param lines number
+--- @param lines integer
 --- @param angle? number
 function DT_Lib.DRAW_CONTEXT:CreateRing(x, y, outerRadius, innerRadius, lines, angle)
   local ring = setmetatable({}, {__index = DT_Lib.DRAW_RING})
@@ -470,7 +473,7 @@ function DT_Lib.DRAW_RING:Fill(color, material)
 end
 
 --- Draws a blur effect on this ring.
---- @param passes number
+--- @param passes integer
 --- @return DT_Lib.DrawRing self
 function DT_Lib.DRAW_RING:Blur(passes)
   DT_Lib.ResetStencil()
