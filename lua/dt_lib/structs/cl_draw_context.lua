@@ -116,13 +116,13 @@ end
 --- Converts a screen value to a local value.
 --- @param v number @The value to convert
 function DT_Lib.DRAW_CONTEXT:ScreenToLocal(v)
-  return v/self.Height/self.Scale*100
+  return v/ScrH()/self.Scale*100
 end
 
 --- Converts a local value to a screen value.
 --- @param v number @The value to convert
 function DT_Lib.DRAW_CONTEXT:LocalToScreen(v)
-  return v/100*self.Height*self.Scale
+  return v/100*ScrH()*self.Scale
 end
 
 --- Translates a local coordinate on the X axis to a screen coordinate.
@@ -181,6 +181,15 @@ function DT_Lib.DRAW_CONTEXT:SetDefaultTextColor(color)
 end
 
 -- Draw simple things --
+
+--- @param text string
+--- @param font? string
+--- @return number length, number height
+function DT_Lib.DRAW_CONTEXT:GetTextSize(text, font)
+  surface.SetFont(font or self:GetDefaultFont())
+  local length, height = surface.GetTextSize(text)
+  return self:ScreenToLocal(length), self:ScreenToLocal(height)
+end
 
 --- @param text string
 --- @param font string

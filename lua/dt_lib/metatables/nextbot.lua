@@ -1,3 +1,4 @@
+--- @class NextBot : Entity
 local NB = FindMetaTable("NextBot")
 
 if SERVER then

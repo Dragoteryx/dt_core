@@ -1,3 +1,4 @@
+--- @class Entity
 local ENT = FindMetaTable("Entity")
 
 -- Entities that are
@@ -10,9 +11,13 @@ function ENT:DT_IsTarget()
   return false
 end
 
--- Timer that expires if the entity isn't valid
+--- Cancellable timer with a vararg that expires if the entity isn't valid.
+--- @param delay number @The delay in seconds
+--- @param func function @The function to call
+--- @vararg any
+--- @return function cancel @Call this function to cancel the timer
 function ENT:DT_Timer(delay, func, ...)
-  DT_Lib.Timer(delay, function(...)
+  return DT_Lib.Timer(delay, function(...)
     if not IsValid(self) then return end
     func(self, ...)
   end, ...)

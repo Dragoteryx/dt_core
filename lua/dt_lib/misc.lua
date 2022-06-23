@@ -22,15 +22,21 @@ function DT_Lib.Unpack(tbl, size, i)
   elseif i == size then return tbl[i] end
 end
 
---- Timer with a vararg
+--- Cancellable timer with a vararg.
 --- @param delay number @The delay in seconds
 --- @param func function @The function to call
 --- @vararg any
+--- @return function cancel @Call this function to cancel the timer
 function DT_Lib.Timer(delay, func, ...)
+  local cancelled = false
   local args, n = DT_Lib.Pack(...)
   timer.Simple(delay, function()
+    if cancelled then return end
     func(DT_Lib.Unpack(args, n))
   end)
+  return function()
+    cancelled = true
+  end
 end
 
 --- Line trace with direction arg

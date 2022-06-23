@@ -1,3 +1,4 @@
+--- @class Player : Entity
 local PLY = FindMetaTable("Player")
 
 -- Get the player's vehicle
