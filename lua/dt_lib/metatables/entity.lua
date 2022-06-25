@@ -115,6 +115,10 @@ if SERVER then
     if not IsValid(ent) then return D_ER
     elseif self == ent then return D_NU
     elseif self.DT_NextBot then return D_HT
+    elseif self:GetClass() == "neo_replicator_melon" then
+      return D_HT
+    elseif self:GetClass() == "dr_kleaner" then
+      return self.EstFou and D_HT or D_NU
     elseif self:IsNPC() then
       return self:Disposition(ent)
     elseif self.IsDrGNextbot then
