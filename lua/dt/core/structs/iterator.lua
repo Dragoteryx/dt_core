@@ -1,4 +1,4 @@
-DT_Core.Iterator = DT_Core.CreateStruct()
+DT_Core.Iterator = DT_Core.Struct()
 
 function DT_Core.Iterator:__new(next)
 	self.Next = next

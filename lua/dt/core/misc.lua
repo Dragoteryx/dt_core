@@ -59,7 +59,7 @@ function DT_Core.TraceHull(tr)
 	return res
 end
 
-function DT_Core.CreateStruct()
+function DT_Core.Struct()
 	local mt = setmetatable({__index = {}}, {
 		__call = function(self, ...)
 			if not isfunction(self.__new) then
@@ -76,6 +76,39 @@ function DT_Core.CreateStruct()
 	end
 	function mt.__is(value)
 		return getmetatable(value) == mt
+	end
+
+	return mt
+end
+
+function DT_Core.NetworkableStruct()
+	local mt = DT_Core.Struct()
+
+	if SERVER then
+		function mt.__index:Send(message, ply)
+			net.Start(message)
+			mt.__write(self)
+			net.Send(ply)
+		end
+		function mt.__index:Broadcast(message)
+			net.Start(message)
+			mt.__write(self)
+			net.Broadcast()
+		end
+	else
+		function mt.__index:SendToServer(message)
+			net.Start(message)
+			mt.__write(self)
+			net.SendToServer()
+		end
+	end
+
+	function mt.Receive(message, func)
+		net.Receive(message, function(len, ply)
+			local value = mt.__raw()
+			mt.__read(value, len, ply)
+			func(value)
+		end)
 	end
 
 	return mt

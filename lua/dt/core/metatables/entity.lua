@@ -32,10 +32,10 @@ function ENT:DT_SetPlayerColor(color)
   else
     function self.GetPlayerColor() return vec end
     if SERVER then
-      DT_Core.NetSender("DT/SetPlayerColor")
-        :WriteEntity(self)
-        :WriteColor(color)
-        :Broadcast()
+      net.Start("DT/SetPlayerColor")
+      net.WriteEntity(self)
+      net.WriteColor(color)
+      net.Broadcast()
     end
   end
 end

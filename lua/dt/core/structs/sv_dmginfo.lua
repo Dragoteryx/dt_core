@@ -1,4 +1,4 @@
-DT_Core.DamageInfo = DT_Core.CreateStruct()
+DT_Core.DamageInfo = DT_Core.Struct()
 
 -- Creates a read-only Lua version of CTakeDamageInfo
 function DT_Core.DamageInfo:__new(dmginfo)

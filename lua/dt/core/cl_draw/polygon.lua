@@ -1,4 +1,4 @@
-DT_Core.DrawPolygon = DT_Core.CreateStruct()
+DT_Core.DrawPolygon = DT_Core.Struct()
 
 local WHITE = Color(255, 255, 255)
 local BLUR = Material("pp/blurscreen")

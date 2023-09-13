@@ -1,4 +1,4 @@
-DT_Core.Lock = DT_Core.CreateStruct()
+DT_Core.Lock = DT_Core.Struct()
 
 function DT_Core.Lock:__new(name)
 	self.__Name = tostring(name or "")

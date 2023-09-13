@@ -1,4 +1,4 @@
-DT_Core.Promise = DT_Core.CreateStruct()
+DT_Core.Promise = DT_Core.Struct()
 
 local PENDING = 0
 local FULFILLED = 1

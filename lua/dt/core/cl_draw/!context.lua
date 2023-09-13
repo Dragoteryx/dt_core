@@ -1,4 +1,4 @@
-DT_Core.DrawContext = DT_Core.CreateStruct()
+DT_Core.DrawContext = DT_Core.Struct()
 
 -- DrawContext constructor
 -- Used as DT_Core.DrawContext(width, height)

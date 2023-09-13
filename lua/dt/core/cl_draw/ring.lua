@@ -1,4 +1,4 @@
-DT_Core.DrawRing = DT_Core.CreateStruct()
+DT_Core.DrawRing = DT_Core.Struct()
 
 local WHITE = Color(255, 255, 255)
 
