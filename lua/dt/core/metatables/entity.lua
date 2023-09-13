@@ -1,30 +1,14 @@
---- @class Entity
 local ENT = FindMetaTable("Entity")
 
--- Entities that are
--- considered as valid "targets"
-function ENT:DT_IsTarget()
-  if self.DT_Target then return true end
-  if self:IsPlayer() then return true end
-  if self:IsNextBot() then return true end
-  if self:IsNPC() then return true end
-  return false
-end
-
---- Cancellable timer with a vararg that expires if the entity isn't valid.
---- @param delay number @The delay in seconds
---- @param func function @The function to call
---- @vararg any
---- @return function cancel @Call this function to cancel the timer
+-- Cancellable timer with a vararg that expires if the entity isn't valid
 function ENT:DT_Timer(delay, func, ...)
-  return DT_Lib.Timer(delay, function(...)
+  return DT_Core.Timer(delay, function(...)
     if not IsValid(self) then return end
     func(self, ...)
   end, ...)
 end
 
--- Checks for collisions before
--- setting an entity's position
+-- Checks for collisions before setting an entity's position
 function ENT:DT_SafeSetPos(pos)
   local tr = self:DT_TraceHull({start = pos, endpos = pos})
   if tr.Hit then return false end
@@ -40,7 +24,7 @@ function ENT:DT_GetPlayerColor()
 end
 
 -- Set the entity's "player color"
--- Only works on some models (mostly playermodels)
+-- Only works on some models (usually playermodels)
 function ENT:DT_SetPlayerColor(color)
   local vec = color:ToVector()
   if self:IsPlayer() then
@@ -48,10 +32,10 @@ function ENT:DT_SetPlayerColor(color)
   else
     function self.GetPlayerColor() return vec end
     if SERVER then
-      net.Start("DT/SetPlayerColor")
-      net.WriteEntity(self)
-      net.WriteColor(color)
-      net.Broadcast()
+      DT_Core.NetSender("DT/SetPlayerColor")
+        :WriteEntity(self)
+        :WriteColor(color)
+        :Broadcast()
     end
   end
 end
@@ -63,7 +47,7 @@ function ENT:DT_TraceLine(tr)
   if self:IsNextBot() and not tr.mask then
     tr.mask = self:GetSolidMask()
   end
-  return DT_Lib.TraceLine(tr)
+  return DT_Core.TraceLine(tr)
 end
 
 function ENT:DT_TraceHull(tr)
@@ -77,7 +61,7 @@ function ENT:DT_TraceHull(tr)
     if tr.step then tr.mins.z = self.loco:GetStepHeight() end
     if not tr.mask then tr.mask = self:GetSolidMask() end
   end
-  return DT_Lib.TraceHull(tr)
+  return DT_Core.TraceHull(tr)
 end
 
 function ENT:DT_LoopkupActivity(act)
@@ -109,18 +93,22 @@ end
 if SERVER then
   util.AddNetworkString("DT/SetPlayerColor")
 
+  -- Entities that are considered valid "targets"
+  function ENT:DT_IsTarget()
+    return tobool(self.DT_Target)
+      or self:IsPlayer()
+      or self:IsNextBot()
+      or self:IsNPC()
+  end
+
   -- Returns an entity's disposition
   -- Compatible with the most used NPC bases
   function ENT:DT_GetDisposition(ent)
     if not IsValid(ent) then return D_ER
     elseif self == ent then return D_NU
-    elseif self.DT_NextBot then return D_HT
-    elseif self:GetClass() == "neo_replicator_melon" then
-      return D_HT
-    elseif self:GetClass() == "dr_kleaner" then
-      return self.EstFou and D_HT or D_NU
     elseif self:IsNPC() then
       return self:Disposition(ent)
+    elseif self.DT_NextBot then return D_HT
     elseif self.IsDrGNextbot then
       return self:GetRelationship(ent, true)
     elseif self.IV04NextBot then
@@ -140,8 +128,9 @@ if SERVER then
         elseif myTeam == entTeam then return D_LI
         else return D_HT end
       end
-    end
-    return D_NU
+    elseif isnumber(self.DT_Disposition) then
+      return self.DT_Disposition
+    else return D_NU end
   end
 
   -- Dissolve an entity (when hit by a combine ball)
@@ -150,7 +139,7 @@ if SERVER then
     local dissolver = ents.Create("env_entity_dissolver")
     if not IsValid(dissolver) then return false end
     if self:GetName() == "" then
-      self:SetName("ent_"..self:GetClass().."_"..self:GetCreationID().."_dissolved")
+      self:SetName("ent_" .. self:GetClass() .. "_" .. self:GetCreationID() .. "_dissolved")
     end
     dissolver:SetKeyValue("dissolvetype", tostring(type or 0))
     dissolver:Fire("dissolve", self:GetName())
@@ -181,11 +170,11 @@ if SERVER then
     if playerColor then
       ragdoll:DT_SetPlayerColor(playerColor)
     end
-    for i = 0, #self:GetBodyGroups()-1 do
+    for i = 0, #self:GetBodyGroups() - 1 do
       ragdoll:SetBodygroup(i, self:GetBodygroup(i))
     end
     ragdoll:Spawn()
-    for i = 0, ragdoll:GetPhysicsObjectCount()-1 do
+    for i = 0, ragdoll:GetPhysicsObjectCount() - 1 do
       local phys = ragdoll:GetPhysicsObjectNum(i)
       if not IsValid(phys) then continue end
       local bone = ragdoll:TranslatePhysBoneToBone(i)
